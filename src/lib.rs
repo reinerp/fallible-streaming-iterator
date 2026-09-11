@@ -737,7 +737,7 @@ where
             }
         }
         self.n = 0;
-        self.advance()
+        self.it.advance()
     }
 
     #[inline]
@@ -893,6 +893,18 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn skip_advances_underlying_iterator() {
+        let items = [10, 20, 30];
+        for count in 0..5 {
+            let mut iter = convert(items.iter().map(Ok::<_, ()>)).skip(count);
+            for expected in items.iter().skip(count) {
+                assert_eq!(iter.next(), Ok(Some(expected)));
+            }
+            assert_eq!(iter.next(), Ok(None));
+        }
+    }
 
     fn _is_object_safe(_: &FallibleStreamingIterator<Item = (), Error = ()>) {}
     fn _is_object_safe_double(_: &DoubleEndedFallibleStreamingIterator<Item = (), Error = ()>) {}
